@@ -43,6 +43,16 @@ AIPs for others to follow.
 [adopting aips in your company]: https://google.aip.dev/adopting
 [contributing to the project]: ./CONTRIBUTING.md
 
+### Want to use AIPs from an LLM (MCP server)?
+
+This fork ships an **MCP (Model Context Protocol) server** that exposes every
+AIP in this repository to LLM clients such as Claude Desktop and Claude Code.
+The whole corpus and the Python server are bundled into a single Docker image,
+so the only host requirement is Docker.
+
+See [`mcp/README.md`](./mcp/README.md) for the build steps and the one-line
+client configuration.
+
 ## License
 
 Except as otherwise noted, the content of this repository is licensed under the

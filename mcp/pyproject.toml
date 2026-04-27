@@ -1,0 +1,28 @@
+[project]
+name = "aip-mcp"
+version = "0.1.0"
+description = "MCP server exposing the Google AIP corpus to LLM clients"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "mcp[cli]>=1.0",
+    "pyyaml>=6.0",
+    "rank-bm25>=0.2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+aip-mcp = "aip_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aip_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
