@@ -50,8 +50,17 @@ AIP in this repository to LLM clients such as Claude Desktop and Claude Code.
 The whole corpus and the Python server are bundled into a single Docker image,
 so the only host requirement is Docker.
 
-See [`mcp/README.md`](./mcp/README.md) for the build steps and the one-line
-client configuration.
+The image is published on Docker Hub as
+[`tsubasatommy/aip-mcp`](https://hub.docker.com/r/tsubasatommy/aip-mcp)
+(multi-arch: `linux/amd64` / `linux/arm64`). To use it, just point your MCP
+client at:
+
+```bash
+docker run --rm -i tsubasatommy/aip-mcp
+```
+
+See [`mcp/README.md`](./mcp/README.md) for full setup, client configuration
+examples, and developer notes.
 
 ## License
 

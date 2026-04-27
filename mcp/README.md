@@ -32,20 +32,18 @@ Google [AIP](https://google.aip.dev) (API Improvement Proposals) コーパス全
 
 ## クイックスタート
 
-### 1. clone してイメージをビルド
+公開済みイメージ **[`tsubasatommy/aip-mcp`](https://hub.docker.com/r/tsubasatommy/aip-mcp)** を使えば、リポジトリの clone もビルドも不要です。ホストに Docker さえあれば動きます（multi-arch: `linux/amd64` / `linux/arm64`）。
+
+### 1. イメージを取得（任意・初回起動時に自動 pull されます）
 
 ```bash
-git clone https://github.com/TsubasaTommy/google.aip.dev.git
-cd google.aip.dev
-docker build -f mcp/Dockerfile -t aip-mcp .
+docker pull tsubasatommy/aip-mcp
 ```
-
-ホストには **Docker が入っていれば十分** で、Python も venv も不要です。AIP 本文はビルド時にイメージへ焼き込まれるので、`docker run` 時にボリュームマウントは要りません。
 
 ### 2. 動作確認（任意）
 
 ```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"1"}}}' | docker run --rm -i aip-mcp
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"1"}}}' | docker run --rm -i tsubasatommy/aip-mcp
 ```
 
 `serverInfo.name = "aip"` を含む JSON が返れば成功。
@@ -62,7 +60,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
   "mcpServers": {
     "aip": {
       "command": "docker",
-      "args": ["run", "--rm", "-i", "aip-mcp"]
+      "args": ["run", "--rm", "-i", "tsubasatommy/aip-mcp"]
     }
   }
 }
@@ -73,10 +71,14 @@ Claude Desktop を再起動。ハンマー / プラグアイコンに `aip` が�
 ### 4. Claude Code に登録
 
 ```bash
-claude mcp add aip -- docker run --rm -i aip-mcp
+claude mcp add aip -- docker run --rm -i tsubasatommy/aip-mcp
 ```
 
 `/mcp` で `aip` が `connected` であることを確認します。
+
+### バージョンを固定したい場合
+
+`tsubasatommy/aip-mcp:latest` ではなく明示タグ（例: `tsubasatommy/aip-mcp:0.1.0`）を指定してください。
 
 ---
 
@@ -93,16 +95,27 @@ LLM への自然言語指示と、内部で呼ばれる Tool の対応例。
 
 ---
 
-## 上流が更新されたら
+## イメージを最新に保つ
 
-AIP の追加・修正を取り込みたいときは、リポジトリを更新してイメージをリビルドします。
+公開イメージは上流の AIP 更新に追随して再 push されます。最新を引き直すには:
 
 ```bash
-git pull
-docker build -f mcp/Dockerfile -t aip-mcp .
+docker pull tsubasatommy/aip-mcp:latest
 ```
 
-依存層は Docker のレイヤキャッシュが効くので、`aip/` だけ変更されている限りリビルドは数秒です。
+クライアント（Claude Desktop / Claude Code）はコンテナ起動時に最新層を使うので、`docker pull` 後に再起動すれば反映されます。
+
+## 自分でビルドする（フォークを改造する場合）
+
+このリポジトリを clone して `mcp/` や `aip/` を改造したい場合のみ、ローカルビルドが必要です。
+
+```bash
+git clone https://github.com/TsubasaTommy/google.aip.dev.git
+cd google.aip.dev
+docker build -f mcp/Dockerfile -t aip-mcp:dev .
+```
+
+ローカルビルドしたイメージを使うときは Claude Desktop の `args` を `["run", "--rm", "-i", "aip-mcp:dev"]` に差し替えてください。
 
 ---
 
@@ -113,7 +126,7 @@ docker build -f mcp/Dockerfile -t aip-mcp .
 | `docker: command not found` | Docker Desktop / Engine をインストール |
 | `Cannot connect to the Docker daemon` | Docker を起動。macOS なら Docker Desktop アプリを開く |
 | Claude Desktop に表示されない | `~/Library/Logs/Claude/mcp*.log` を確認。多くは `args` の typo |
-| AIP が古いまま | リビルド: `docker build -f mcp/Dockerfile -t aip-mcp .` |
+| AIP が古いまま | `docker pull tsubasatommy/aip-mcp:latest` で取り直し、クライアントを再起動 |
 
 ---
 
